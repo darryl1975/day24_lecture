@@ -13,12 +13,11 @@ public class BankAccountService {
     @Autowired
     BankAccountRepo bankAcctRepo;
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Transactional //(isolation = Isolation.READ_UNCOMMITTED)
     public Boolean transferMoney(Integer accountFrom, Integer accountTo, Float amount) {
         Boolean bTransferred = false;
         Boolean bWithdrawn = false;
         Boolean bDeposited = false;
-        Boolean bCanWithdraw = false;
 
         BankAccount depositAccount = null;
         BankAccount withdrawalAccount = null;
@@ -36,15 +35,18 @@ public class BankAccountService {
 
         // check withdrawn account has more money than withdrawal amount
         if (bProceed) {
-            if (withdrawalAccount.getBalance() >= amount)
-                bCanWithdraw = true;
-            else
+            if (withdrawalAccount.getBalance() < amount)
                 bProceed = false;
         }
 
         if (bProceed) {
             // perform the withdrawal (requires transaction)
             bWithdrawn = bankAcctRepo.withdrawAmount(accountFrom, amount);
+
+            bWithdrawn = false;
+            if (!bWithdrawn) {
+                throw new IllegalArgumentException("Simulate error before Withdrawal");
+            }
 
             // perform the deposit (requires transaction)
             bDeposited = bankAcctRepo.depositAmount(accountTo, amount);
