@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import sg.edu.nus.iss.demoTransaction.exception.BookException;
 import sg.edu.nus.iss.demoTransaction.model.Book;
 import sg.edu.nus.iss.demoTransaction.model.Resv;
 import sg.edu.nus.iss.demoTransaction.model.ResvDetails;
@@ -75,6 +76,8 @@ public class ReservationService {
             }
 
             bReservationCompleted = true;
+        } else {
+            throw new BookException("Book is not available.");
         }
 
         return bReservationCompleted;
