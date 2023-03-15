@@ -13,26 +13,21 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import sg.edu.nus.iss.demoTransaction.model.Book;
+import sg.edu.nus.iss.demoTransaction.model.Resv;
 
 @Repository
-public class BookRepo {
+public class ResvRepo {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    private final String SELECT_SQL = "select * from book";
-    private final String INSERT_SQL = "insert into book (title, quantity) values (?, ?)";
-    private final String UPDATE_SQL = "update book set quantity = quantity - 1 where id = ?";
+    private final String SELECT_SQL = "select * from resv";
+    private final String INSERT_SQL = "insert into resv (resv_date, full_name) values (?, ?)";
 
-    public List<Book> findAll() {
-        return jdbcTemplate.query(SELECT_SQL, BeanPropertyRowMapper.newInstance(Book.class));
+    public List<Resv> findAll() {
+        return jdbcTemplate.query(SELECT_SQL, BeanPropertyRowMapper.newInstance(Resv.class));
     }
 
-    public int update(Integer id) {
-        return jdbcTemplate.update(UPDATE_SQL, id);
-    }
-
-    public Integer createBook(Book book) {
+    public Integer createResv(Resv resv) {
         // Create GeneratedKeyHolder object
         KeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
@@ -41,8 +36,8 @@ public class BookRepo {
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(INSERT_SQL, new String[] {"id"});
 
-                ps.setString(1, book.getTitle());
-                ps.setInt(2, book.getQuantity());
+                ps.setDate(1, resv.getResvDate());
+                ps.setString(2, resv.getFullName());
                 return ps;
             }
         };
@@ -54,5 +49,4 @@ public class BookRepo {
 
         return returnedId;
     }
-
 }
