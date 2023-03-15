@@ -37,7 +37,8 @@ public class ReservationService {
         Boolean bBooksAvailable = true;
         List<Book> libBooks = bRepo.findAll();
         for (Book book : books) {
-            List<Book> filteredBook = libBooks.stream().filter(b -> b.getId().equals(book.getId())).collect(Collectors.toList());
+            List<Book> filteredBook = libBooks.stream().filter(b -> b.getId().equals(book.getId()))
+                    .collect(Collectors.toList());
 
             if (!filteredBook.isEmpty()) {
                 if (filteredBook.get(0).getQuantity() == 0) {
@@ -57,22 +58,24 @@ public class ReservationService {
         // minus quantity from the books (requires transaction)
         // QuantityUpdate Marker
 
-        // create the reservation record (requires transaction)
-        Resv reservation = new Resv();
-        reservation.setFullName(reservePersonName);
-        reservation.setResvDate(Date.valueOf(LocalDate.now()));
-        Integer reservationId = rRepo.createResv(reservation);
+        if (!bBooksAvailable) {
+            // create the reservation record (requires transaction)
+            Resv reservation = new Resv();
+            reservation.setFullName(reservePersonName);
+            reservation.setResvDate(Date.valueOf(LocalDate.now()));
+            Integer reservationId = rRepo.createResv(reservation);
 
-        // create the reservation details' records (requires transaction)
-        for(Book book: books) {
-            ResvDetails reservationDetail = new ResvDetails();
-            reservationDetail.setBookId(book.getId());
-            reservationDetail.setResvId(reservationId);
+            // create the reservation details' records (requires transaction)
+            for (Book book : books) {
+                ResvDetails reservationDetail = new ResvDetails();
+                reservationDetail.setBookId(book.getId());
+                reservationDetail.setResvId(reservationId);
 
-            rdRepo.createResvDetails(reservationDetail);
+                rdRepo.createResvDetails(reservationDetail);
+            }
+
+            bReservationCompleted = true;
         }
-
-        bReservationCompleted = true;
 
         return bReservationCompleted;
     }
