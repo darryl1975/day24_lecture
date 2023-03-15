@@ -58,7 +58,7 @@ public class ReservationService {
         // minus quantity from the books (requires transaction)
         // QuantityUpdate Marker
 
-        if (!bBooksAvailable) {
+        if (bBooksAvailable) {
             // create the reservation record (requires transaction)
             Resv reservation = new Resv();
             reservation.setFullName(reservePersonName);
